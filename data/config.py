@@ -14,3 +14,6 @@ DB_NAME = config('DB_NAME')
 DB_USERNAME = config('DB_USERNAME')
 DB_HOST = config('DB_HOST')
 DB_CHARSET = config('DB_CHARSET')
+
+# sms activate
+SMS_API_KEY = config('SMS_API_KEY')

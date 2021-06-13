@@ -1,5 +1,8 @@
-
+from .models import (
+    CountryModel,
+)
 
 
 def setup():
-    pass
+    if not CountryModel.table_exists():
+        CountryModel.create_table()
