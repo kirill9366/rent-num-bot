@@ -11,3 +11,8 @@ class BaseModel(peewee.Model):
 class CountryModel(BaseModel):
     title = peewee.CharField(max_length=100)
     code = peewee.IntegerField()
+
+
+class SocialNetworkModel(BaseModel):
+    title = peewee.CharField(max_length=100)
+    code = peewee.CharField(max_length=10)

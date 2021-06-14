@@ -11,7 +11,7 @@ async def get_menu_keyboard():
     lesson_keyboard.add(
         InlineKeyboardButton(
             'Арендовать номер',
-            callback_data=f'choose_country',
+            callback_data=f'rent_num',
         )
     )
     lesson_keyboard.add(

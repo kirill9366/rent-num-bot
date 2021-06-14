@@ -13,6 +13,7 @@ from .balance import (
 )
 from .rent_num import (
     choose_country_handler,
+    choose_social_network_handler,
 )
 
 
@@ -35,5 +36,9 @@ def setup(dp: Dispatcher):
     )
     dp.register_callback_query_handler(
         choose_country_handler,
+        text_contains='rent_num',
+    )
+    dp.register_callback_query_handler(
+        choose_social_network_handler,
         text_contains='choose_country',
     )
