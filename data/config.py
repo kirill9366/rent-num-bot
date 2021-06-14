@@ -17,3 +17,7 @@ DB_CHARSET = config('DB_CHARSET')
 
 # sms activate
 SMS_API_KEY = config('SMS_API_KEY')
+
+# qiwi
+QIWI_API_KEY = config('QIWI_API_KEY')
+QIWI_NUMBER = config('QIWI_NUMBER')

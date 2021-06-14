@@ -27,14 +27,21 @@ from web_handlers.middleware.session import request_user_middleware
 
 import os
 
+from tasks import (
+    check_payments,
+)
+
 
 async def on_startup(app: web.Application):
 
     setup(loader.dp)
     database.setup()
 
+    check_payments.delay()
+
     if config.BOT_PLACE == 'locale':
         await loader.dp.start_polling()
+        return
     else:
         await loader.dp.bot.delete_webhook()
         await loader.dp.bot.set_webhook(

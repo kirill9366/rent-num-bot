@@ -11,10 +11,16 @@ from peewee_async import (
 from playhouse.migrate import MySQLMigrator
 from playhouse.shortcuts import ReconnectMixin
 
+import pyqiwi
+
 
 bot = Bot(config.BOT_TOKEN, parse_mode=ParseMode.HTML, validate_token=True)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
+qiwi_api = pyqiwi.Wallet(
+    token=config.QIWI_API_KEY,
+    number=config.QIWI_NUMBER,
+)
 
 
 class ReconnectMySQLDatabase(ReconnectMixin, MySQLDatabase):

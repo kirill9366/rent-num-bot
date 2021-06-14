@@ -4,9 +4,11 @@ from loader import bot
 
 from keyboards.start import get_menu_keyboard
 
+from utils.db_api.tguser import get_or_create_tguser
+
 
 async def start_handler(message: types.Message):
-
+    await get_or_create_tguser(message.chat.id)
     await bot.send_message(
         message.chat.id,
         '''

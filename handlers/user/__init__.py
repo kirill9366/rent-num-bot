@@ -10,6 +10,7 @@ from .menu import (
 from .balance import (
     balance_handler,
     top_up_balance_handler,
+    check_payment_handler,
 )
 from .rent_num import (
     choose_country_handler,
@@ -41,4 +42,8 @@ def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
         choose_social_network_handler,
         text_contains='choose_country',
+    )
+    dp.register_callback_query_handler(
+        check_payment_handler,
+        text_contains='check_payment',
     )

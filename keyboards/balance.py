@@ -16,3 +16,17 @@ async def get_balance_keyboard():
         )
     )
     return lesson_keyboard
+
+
+async def check_payment_keyboard():
+    check_payment_keyboard = InlineKeyboardMarkup(
+        row_width=1,
+        resize_keyboard=True,
+    )
+    check_payment_keyboard.add(
+        InlineKeyboardButton(
+            'Проверить платеж',
+            callback_data=f'check_payment',
+        )
+    )
+    return check_payment_keyboard
