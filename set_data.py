@@ -46,7 +46,8 @@ async def create_social_networks():
 
 async def main():
     # await create_countries()
-    await create_social_networks()
+    # await create_social_networks()
+    return
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())

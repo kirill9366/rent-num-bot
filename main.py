@@ -27,7 +27,7 @@ from web_handlers.middleware.session import request_user_middleware
 
 import os
 
-from tasks import (
+from tasks.celery import (
     check_payments,
 )
 

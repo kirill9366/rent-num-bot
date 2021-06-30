@@ -13,6 +13,8 @@ from playhouse.shortcuts import ReconnectMixin
 
 import pyqiwi
 
+from smsactivateru import Sms
+
 
 bot = Bot(config.BOT_TOKEN, parse_mode=ParseMode.HTML, validate_token=True)
 storage = MemoryStorage()
@@ -21,6 +23,7 @@ qiwi_api = pyqiwi.Wallet(
     token=config.QIWI_API_KEY,
     number=config.QIWI_NUMBER,
 )
+sms_activate_api = Sms(config.SMS_API_KEY)
 
 
 class ReconnectMySQLDatabase(ReconnectMixin, MySQLDatabase):
