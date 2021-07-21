@@ -15,6 +15,10 @@ import pyqiwi
 
 from smsactivateru import Sms
 
+import requests
+
+import simplejson
+
 
 bot = Bot(config.BOT_TOKEN, parse_mode=ParseMode.HTML, validate_token=True)
 storage = MemoryStorage()
@@ -23,7 +27,29 @@ qiwi_api = pyqiwi.Wallet(
     token=config.QIWI_API_KEY,
     number=config.QIWI_NUMBER,
 )
-sms_activate_api = Sms(config.SMS_API_KEY)
+
+
+class SmsActivateWrapper(Sms):
+
+    def request(self, action, response_format='string'):
+        try:
+            params = {**{'api_key': self.key}, **action.data}
+            response = requests.get(self.url, params)
+
+            if response_format == 'string':
+                return response.text
+            elif response_format == 'json':
+                try:
+                    return response.json()
+                except simplejson.errors.JSONDecodeError:
+                    return response.text
+            else:
+                return 'BAD_FORMAT'
+        except (ConnectionError, TimeoutError):
+            return 'NO_CONNECTION'
+
+
+sms_activate_api = SmsActivateWrapper(config.SMS_API_KEY)
 
 
 class ReconnectMySQLDatabase(ReconnectMixin, MySQLDatabase):

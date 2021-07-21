@@ -18,3 +18,10 @@ async def get_all_countries():
     return await objects.execute(
         CountryModel.select()
     )
+
+
+async def get_country_model(**kwargs):
+    return await objects.get(
+        CountryModel,
+        **kwargs,
+    )

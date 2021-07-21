@@ -15,6 +15,9 @@ from .balance import (
 from .rent_num import (
     choose_country_handler,
     choose_social_network_handler,
+    buy_confirm_handler,
+    buy_number_handler,
+    check_sms_handler,
 )
 
 
@@ -41,8 +44,20 @@ def setup(dp: Dispatcher):
     )
     dp.register_callback_query_handler(
         choose_social_network_handler,
-        text_contains='choose_country',
-    )
+        text_contains='choose_social_network',
+    ),
+    dp.register_callback_query_handler(
+        buy_confirm_handler,
+        text_contains='buy_confirm',
+    ),
+    dp.register_callback_query_handler(
+        buy_number_handler,
+        text_contains='buy_number',
+    ),
+    dp.register_callback_query_handler(
+        check_sms_handler,
+        text_contains='check_sms',
+    ),
     dp.register_callback_query_handler(
         check_payment_handler,
         text_contains='check_payment',
