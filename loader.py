@@ -20,7 +20,7 @@ import requests
 import simplejson
 
 
-bot = Bot(config.BOT_TOKEN, parse_mode=ParseMode.HTML, validate_token=True)
+bot = Bot(config.BOT_TOKEN, parse_mode=ParseMode.MARKDOWN, validate_token=True)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 qiwi_api = pyqiwi.Wallet(

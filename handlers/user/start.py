@@ -14,6 +14,8 @@ async def start_handler(message: types.Message):
         '''
 Здравствуйте!
 Если вам нужно быстро и легко арендовать номер телефона, то я смогу вам помочь!
+Код данного бота можно посмотреть по ссылке:
+https://github.com/kirill9366/rent-num-bot
         ''',
         reply_markup=await get_menu_keyboard(),
     )

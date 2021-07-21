@@ -30,11 +30,11 @@ async def balance_handler(message: types.Message):
 async def top_up_balance_handler(query: types.CallbackQuery):
     qiwi_order = await create_qiwi_order(query.message.chat.id)
     await query.message.edit_text(
-        f'''
-Вам нужно отправить деньги на номер {config.QIWI_NUMBER} с комментарием:
-{qiwi_order.signature}
+        f"""
+Вам нужно отправить деньги на номер ```{config.QIWI_NUMBER}``` с комментарием:
+```{qiwi_order.signature}```
 После чего деньги поступят на ваш баланс.
-        ''',
+        """,
         reply_markup=await check_payment_keyboard(),
     )
 
