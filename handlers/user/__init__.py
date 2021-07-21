@@ -18,6 +18,7 @@ from .rent_num import (
     buy_confirm_handler,
     buy_number_handler,
     check_sms_handler,
+    number_already_used_handler,
 )
 
 
@@ -57,6 +58,10 @@ def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
         check_sms_handler,
         text_contains='check_sms',
+    ),
+    dp.register_callback_query_handler(
+        number_already_used_handler,
+        text_contains='number_already_used',
     ),
     dp.register_callback_query_handler(
         check_payment_handler,

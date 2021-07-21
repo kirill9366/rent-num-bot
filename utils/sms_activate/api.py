@@ -70,17 +70,17 @@ async def create_order_number(
 
 async def set_status_order(order_id, status='start'):
     if status == 'start':
-        return SetStatus(
-            id=order_id,
-            status=SmsTypes.Status.SmsSent
-        ).request(sms_activate_api)
+        status = SmsTypes.Status.SmsSent
     elif status == 'end':
-        return SetStatus(
-            id=order_id,
-            status=SmsTypes.Status.End
-        ).request(sms_activate_api)
+        status = SmsTypes.Status.End
+    elif status == 'already_used':
+        status = SmsTypes.Status.AlreadyUsed
     else:
         return False
+    return SetStatus(
+        id=order_id,
+        status=status
+    ).request(sms_activate_api)
 
 
 async def get_status_order(order_id):

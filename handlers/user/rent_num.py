@@ -108,7 +108,10 @@ async def buy_number_handler(query: types.CallbackQuery):
 Социальная сеть: {social_network.title}
 Номер телефона: {phone_number}
             ''',
-            reply_markup=await get_buy_number_keyboard(order_id)
+            reply_markup=await get_buy_number_keyboard(
+                order_id,
+                price,
+            )
         )
     else:
         await bot.answer_callback_query(
@@ -120,7 +123,13 @@ async def buy_number_handler(query: types.CallbackQuery):
 async def check_sms_handler(query: types.CallbackQuery):
     order_id = query.data.replace('check_sms ', '')
     logger.info(query.data)
-    order_status = await get_status_order(order_id)
+    try:
+        order_status = await get_status_order(order_id)
+    except Exception as e:
+        logger.warning(e)
+        return await query.message.edit_text(
+            f'Время получения сообщения вышло'
+        )
     logger.info(order_status)
     if order_status['code']:
         await query.message.edit_text(
@@ -135,3 +144,19 @@ async def check_sms_handler(query: types.CallbackQuery):
             query.id,
             text='Сообщение не пришло'
         )
+
+
+async def number_already_used_handler(query: types.CallbackQuery):
+    order_id, price = query.data.replace('number_already_used ', '').split()
+    await set_status_order(
+        order_id,
+        status='already_used'
+    )
+    user = await get_or_create_tguser(
+        user_id=query.message.chat.id,
+    )
+    user.balance += int(price)
+    user.save()
+    await query.message.edit_text(
+        'Средства были возвращены на ваш баланс!'
+    )
