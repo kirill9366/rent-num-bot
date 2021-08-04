@@ -1,6 +1,8 @@
 import peewee
 
-from loader import database
+from loader import database, objects
+
+from utils.db_api.queryset import QuerySet
 
 
 class BaseModel(peewee.Model):
@@ -29,3 +31,9 @@ class QiwiOrderModel(BaseModel):
     quantity_attempts = peewee.IntegerField(default=0)
     amount = peewee.IntegerField(null=True)
     paid = peewee.BooleanField(default=False)
+
+
+country_model = QuerySet(CountryModel, objects)
+social_network_model = QuerySet(SocialNetworkModel, objects)
+tg_user_model = QuerySet(TGUserModel, objects)
+qiwi_order_model = QuerySet(QiwiOrderModel, objects)

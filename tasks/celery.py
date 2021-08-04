@@ -1,6 +1,8 @@
 from celery import Celery
 
-from utils.db_api.qiwiorder import get_qiwi_order
+from database import (
+    qiwi_order_model,
+)
 from utils.qiwi_api import get_transactions
 
 import asyncio
@@ -17,8 +19,8 @@ app = Celery(
 
 @app.task
 def check_payments():
+    loop = asyncio.get_event_loop()
     while True:
-        loop = asyncio.get_event_loop()
         try:
             transactions = loop.run_until_complete(
                 get_transactions()
@@ -29,10 +31,8 @@ def check_payments():
         for transaction in transactions:
             if not transaction.comment:
                 continue
-            qiwi_order = loop.run_until_complete(
-                get_qiwi_order(
-                    signature=transaction.comment
-                )
+            qiwi_order = qiwi_order_model.get_object(
+                signature=transaction.comment
             )
             if qiwi_order:
                 qiwi_order.amount = transaction.sum.amount

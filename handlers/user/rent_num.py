@@ -13,14 +13,10 @@ from utils.sms_activate.api import (
     set_status_order,
     get_status_order,
 )
-from utils.db_api.tguser import (
-    get_or_create_tguser,
-)
-from utils.db_api.country import (
-    get_country_model,
-)
-from utils.db_api.social_network import (
-    get_social_network_model,
+from database import (
+    country_model,
+    social_network_model,
+    tg_user_model,
 )
 
 from loader import (
@@ -62,13 +58,15 @@ async def buy_confirm_handler(query: types.CallbackQuery):
         .replace('buy_confirm ', '')
         .split()
     )
-    country = await get_country_model(code=int(country_code))
-    social_network = await get_social_network_model(code=social_network_code)
+    country = await country_model.get_object(code=country_code)
+    social_network = await social_network_model.get_object(
+        code=social_network_code,
+    )
     await query.message.edit_text(
         f'''
 Вы хотите арендовать номер:
-Страна: {country.title}
-Социальная сеть: {social_network.title}
+Страна: {country.get_field("title")}
+Социальная сеть: {social_network.get_field("title")}
 Цена: {price} р.
         ''',
         reply_markup=await get_buy_confirm_keyboard(
@@ -88,24 +86,24 @@ async def buy_number_handler(query: types.CallbackQuery):
         .split()
     )
     user_id = query.message.chat.id
-    user = await get_or_create_tguser(user_id)
-    if user.balance >= int(price):
-        user.balance -= int(price)
-        user.save()
+    user = await tg_user_model.get_object(user_id=user_id)
+    if user.get_field('balance') >= int(price):
+        new_balance = user.get_field('balance') - int(price)
+        await user.update_field('balance', new_balance)
         status, order_id, phone_number = await create_order_number(
             country_code,
             social_network_code,
         )
         await set_status_order(order_id)
-        country = await get_country_model(code=int(country_code))
-        social_network = await get_social_network_model(
+        country = await country_model.get_object(code=int(country_code))
+        social_network = await social_network_model.get_object(
             code=social_network_code,
         )
         await query.message.edit_text(
             f'''
 Вы арендовали номер:
-Страна: {country.title}
-Социальная сеть: {social_network.title}
+Страна: {country.get_field("title")}
+Социальная сеть: {social_network.get_field("title")}
 Номер телефона: {phone_number}
             ''',
             reply_markup=await get_buy_number_keyboard(
@@ -152,11 +150,11 @@ async def number_already_used_handler(query: types.CallbackQuery):
         order_id,
         status='already_used'
     )
-    user = await get_or_create_tguser(
+    user = await tg_user_model.get_object(
         user_id=query.message.chat.id,
     )
-    user.balance += int(price)
-    user.save()
+    new_balance = user.get_field('balance') + int(price)
+    await user.update_field('balance', new_balance)
     await query.message.edit_text(
         'Средства были возвращены на ваш баланс!'
     )

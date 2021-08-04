@@ -3,6 +3,10 @@ from .models import (
     SocialNetworkModel,
     TGUserModel,
     QiwiOrderModel,
+    country_model,
+    social_network_model,
+    tg_user_model,
+    qiwi_order_model,
 )
 
 

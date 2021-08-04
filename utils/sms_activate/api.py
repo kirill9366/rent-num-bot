@@ -9,6 +9,8 @@ import inspect
 
 from loader import sms_activate_api
 
+from loguru import logger
+
 
 class GetCurrentPrices(ActionsModel):
     _name = 'getPrices'
@@ -62,10 +64,12 @@ async def create_order_number(
     country_code,
     social_network_code,
 ):
-    return GetNumber(
+    result =  GetNumber(
         social_network_code,
         country=country_code,
     ).request(sms_activate_api)
+    logger.info(result)
+    return result
 
 
 async def set_status_order(order_id, status='start'):

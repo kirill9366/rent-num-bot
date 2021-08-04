@@ -4,60 +4,76 @@ from loader import bot
 
 from data import config
 
+from uuid import uuid4
+
+from loguru import logger
+
 from keyboards.balance import (
     get_balance_keyboard,
     check_payment_keyboard,
 )
 
-from utils.db_api.tguser import get_or_create_tguser
-from utils.db_api.qiwiorder import (
-    get_qiwi_order,
-    create_qiwi_order,
+from database import (
+    qiwi_order_model,
+    tg_user_model,
 )
 
 
 async def balance_handler(message: types.Message):
-    user = await get_or_create_tguser(message.chat.id)
+    user = await tg_user_model.get_object(user_id=message.chat.id)
     await bot.send_message(
         message.chat.id,
         f'''
-Баланс: {user.balance} р.
+Баланс: {user.get_field("balance")} р.
         ''',
         reply_markup=await get_balance_keyboard(),
     )
 
 
 async def top_up_balance_handler(query: types.CallbackQuery):
-    qiwi_order = await create_qiwi_order(query.message.chat.id)
+    user = await tg_user_model.get_object(user_id=query.message.chat.id)
+    signature = uuid4()
+    qiwi_order = await qiwi_order_model.create_object(
+        tguser=user.get_field('id'),
+        signature=signature,
+    )
     await query.message.edit_text(
         f"""
-Вам нужно отправить деньги на номер ```{config.QIWI_NUMBER}``` с комментарием:
-```{qiwi_order.signature}```
+Вам нужно отправить деньги на номер <code>{config.QIWI_NUMBER}</code> с комментарием:
+<code>{qiwi_order.get_field("signature")}</code>
 После чего деньги поступят на ваш баланс.
         """,
-        reply_markup=await check_payment_keyboard(),
+        reply_markup=await check_payment_keyboard(signature),
     )
 
 
 async def check_payment_handler(query: types.CallbackQuery):
-    tguser = await get_or_create_tguser(
-        query.message.chat.id,
+    signature = query.data.replace('check_payment ', '')
+    tguser = await tg_user_model.get_object(user_id=query.message.chat.id,)
+    qiwi_order = await qiwi_order_model.get_object(
+        signature=signature,
     )
-    qiwi_order = await get_qiwi_order(tguser=tguser)
-    if qiwi_order.paid:
-        tguser.balance += qiwi_order.amount
-        tguser.save()
+    logger.info(qiwi_order.get_field('paid'))
+    if qiwi_order.get_field('paid') == 1:
+        tguser_balance = tguser.get_field('balance')
+        await tguser.update_field(
+            'balance',
+            tguser_balance + qiwi_order.get_field('amount')
+        )
         await query.message.edit_text(
-            text=f'Баланс: {tguser.balance} р.'
+            text=f'Баланс: {tguser.get_field("balance")} р.'
         )
     else:
-        if qiwi_order.quantity_attempts >= 5:
-            qiwi_order.delete_instance()
+        if qiwi_order.get_field('quantity_attempts') >= 5:
+            await qiwi_order.delete()
             await query.message.edit_text(
                 text='Слишком большое количество попыток!'
             )
-        qiwi_order.quantity_attempts += 1
-        qiwi_order.save()
+        quantity_attempts = qiwi_order.get_field('quantity_attempts')
+        await qiwi_order.update_field(
+            'quantity_attempts',
+            quantity_attempts + 1,
+        )
         await bot.answer_callback_query(
             query.id,
             text='Оплата не пришла, попробуйте еще раз нажать на кнопку позже'
